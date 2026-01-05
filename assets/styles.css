@@ -345,26 +345,28 @@ tr:hover td { background: rgba(255,255,255,0.03); }
   .card-value { font-size: 24px; }
   .main-content { padding: 14px 12px 30px; }
 }
-#bottomTicker{
-  position: fixed;
-  bottom: 0;          /* THIS is the key line */
-  left: 0;
-  right: 0;
-  z-index: 9999;
+<style>
+  /* HARD OVERRIDE for RSS.app ticker */
+  rssapp-ticker#2GRWnER1Lk94t2R8 {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    top: auto !important;
+    z-index: 999999 !important;
+    display: block !important;
+    background: rgba(0,0,0,0.85) !important;
+    border-top: 1px solid rgba(255,255,255,0.15) !important;
+  }
 
-  background: rgba(0,0,0,0.85);
-  border-top: 1px solid rgba(255,255,255,0.15);
-}
+  /* The widget commonly renders an iframe inside */
+  rssapp-ticker#2GRWnER1Lk94t2R8 iframe {
+    width: 100% !important;
+    display: block !important;
+  }
 
-/* Make sure the RSS widget spans full width */
-#bottomTicker rssapp-ticker,
-#bottomTicker iframe{
-  width: 100% !important;
-  display: block;
-}
+  /* prevent your content being hidden behind it */
+  body { padding-bottom: 70px !important; }
+</style>
 
-/* Prevent content from hiding behind ticker */
-body{
-  padding-bottom: 64px;
-}
 
