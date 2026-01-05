@@ -20,7 +20,6 @@ const DEFAULT_LOCATION = {
 };
 
 function resolveLocation(settings) {
-  // Try multiple shapes your settings might use
   const loc =
     settings?.location ||
     settings?.loc ||
@@ -34,8 +33,6 @@ function resolveLocation(settings) {
   if (typeof lat === "number" && typeof lon === "number") {
     return { name: loc?.name || "Saved Location", lat, lon };
   }
-
-  // Fallback to Gahanna
   return DEFAULT_LOCATION;
 }
 
@@ -44,19 +41,104 @@ function safeNum(v, fallback = 0) {
   return Number.isFinite(n) ? n : fallback;
 }
 
+function clamp(n, a, b) {
+  return Math.max(a, Math.min(b, n));
+}
+
 function barRow(name, score, weight, explanation) {
-  const pct = Math.round(safeNum(score, 0));
-  const contrib = Math.round(safeNum(score, 0) * safeNum(weight, 0));
+  const pct = clamp(Math.round(safeNum(score, 0)), 0, 100);
+  const w = clamp(safeNum(weight, 0), 0, 1);
+  const contrib = Math.round(pct * w);
+
+  const strength =
+    pct >= 75 ? "Strong signal" : pct >= 50 ? "Moderate signal" : pct >= 25 ? "Weak signal" : "Very weak signal";
+
   return `
     <div class="factor-row">
       <div class="factor-head">
         <div class="factor-name">${name}</div>
-        <div class="factor-meta">Score ${pct} • Weight ${Math.round(safeNum(weight, 0) * 100)}% • Contrib ${contrib}</div>
+        <div class="factor-meta">${strength} • ${pct}% • Weight ${Math.round(w * 100)}%</div>
       </div>
       <div class="factor-bar">
-        <div class="factor-bar-fill" style="width:${Math.max(0, Math.min(100, pct))}%"></div>
+        <div class="factor-bar-fill" style="width:${pct}%"></div>
       </div>
       <div class="factor-expl">${explanation}</div>
+    </div>
+  `;
+}
+
+function describeLowProbability(prediction, weatherData) {
+  const p = safeNum(prediction?.probability, 0);
+
+  // Try to infer the "top reasons holding it down" from factors
+  const factors = Array.isArray(prediction?.factors) ? prediction.factors : [];
+  const lowOnes = [...factors]
+    .sort((a, b) => safeNum(a.score, 0) - safeNum(b.score, 0))
+    .slice(0, 3);
+
+  const provider = weatherData?.provider || "your weather source";
+  const hasSnowMetric =
+    Array.isArray(weatherData?.hourly) && weatherData.hourly.some((h) => safeNum(h?.snowIn, 0) > 0);
+
+  // A nicer, more specific block depending on probability range
+  if (p < 15) {
+    return `
+      <div class="why-low-box">
+        <div class="why-low-title">Why it’s very low (${p}%)</div>
+        <ul class="why-low-list">
+          <li><b>Not enough “closure-level” impact signals</b> during the commute window based on ${provider}.</li>
+          <li><b>Road conditions likely manageable</b> (either not much snow/ice expected, or temps/wind don’t support rapid icing).</li>
+          <li><b>Uncertainty is usually in your favor</b> at this level: models can be wrong, but it typically takes a big miss to reach closing territory.</li>
+          ${!hasSnowMetric ? `<li><b>Note:</b> This source may not provide explicit snowfall totals. Snow score may rely more on precip/temp patterns.</li>` : ""}
+        </ul>
+        ${lowOnes.length ? `
+          <div class="why-low-sub">
+            <div class="why-low-subtitle">Weakest signals right now</div>
+            <ul class="why-low-list compact">
+              ${lowOnes.map(f => `<li><b>${f.name}:</b> ${clamp(Math.round(safeNum(f.score,0)),0,100)}% — ${f.explanation}</li>`).join("")}
+            </ul>
+          </div>
+        ` : ""}
+      </div>
+    `;
+  }
+
+  if (p < 35) {
+    return `
+      <div class="why-low-box">
+        <div class="why-low-title">Why it’s low-ish (${p}%)</div>
+        <ul class="why-low-list">
+          <li><b>Some impact is possible</b>, but the strongest closure triggers aren’t lining up together (snow + timing + temperature + wind/visibility).</li>
+          <li><b>Timing matters:</b> if heavier precip is outside the commute window, roads often get treated/cleared before it counts.</li>
+          <li><b>Small changes can swing it</b>: a 2–4°F drop, heavier banding, or earlier onset can bump probability quickly.</li>
+        </ul>
+        ${lowOnes.length ? `
+          <div class="why-low-sub">
+            <div class="why-low-subtitle">What’s holding it back most</div>
+            <ul class="why-low-list compact">
+              ${lowOnes.map(f => `<li><b>${f.name}:</b> ${clamp(Math.round(safeNum(f.score,0)),0,100)}% — ${f.explanation}</li>`).join("")}
+            </ul>
+          </div>
+        ` : ""}
+      </div>
+    `;
+  }
+
+  return `
+    <div class="why-low-box">
+      <div class="why-low-title">Why it isn’t higher (${p}%)</div>
+      <ul class="why-low-list">
+        <li><b>Conditions may be borderline</b> — enough to affect travel, not enough (yet) to make closing the most likely choice.</li>
+        <li><b>Watch the next forecast update</b>: shifts in start time, intensity, and temperatures usually decide the direction.</li>
+      </ul>
+      ${lowOnes.length ? `
+        <div class="why-low-sub">
+          <div class="why-low-subtitle">Biggest “missing pieces”</div>
+          <ul class="why-low-list compact">
+            ${lowOnes.map(f => `<li><b>${f.name}:</b> ${clamp(Math.round(safeNum(f.score,0)),0,100)}% — ${f.explanation}</li>`).join("")}
+          </ul>
+        </div>
+      ` : ""}
     </div>
   `;
 }
@@ -64,27 +146,34 @@ function barRow(name, score, weight, explanation) {
 export function renderSnowday(container, prediction, weatherData, settings) {
   const s = settings || {};
   const loc = resolveLocation(s);
-  const bus = s.schoolTimes?.busTime || "07:00";
-  const bell = s.schoolTimes?.firstBell || "08:00";
 
   const provider =
     weatherData?.provider ||
     weatherData?.source ||
     (weatherData?.failoverLevel != null ? `failover-${weatherData.failoverLevel}` : "unknown");
 
+  const prob = safeNum(prediction?.probability, 0);
+  const conf = safeNum(prediction?.confidence, 0);
+
+  // Create a short, nicer "why" summary
+  const factors = Array.isArray(prediction?.factors) ? prediction.factors : [];
+  const topDrivers = [...factors]
+    .sort((a, b) => safeNum(b.score, 0) * safeNum(b.weight, 0) - safeNum(a.score, 0) * safeNum(a.weight, 0))
+    .slice(0, 3);
+
   container.innerHTML = `
     <h1>Snow Day / School Impact</h1>
-    <p class="card-label">${loc.name} • Bus ${bus} • First bell ${bell} • Source: ${provider}</p>
+    <p class="card-label">${loc.name} • Source: ${provider}</p>
 
     <div class="cards-grid">
       <div class="card">
         <div class="card-header">Probability</div>
-        <div class="card-value">${safeNum(prediction?.probability, 0)}%</div>
+        <div class="card-value">${prob}%</div>
         <div class="card-label">${prediction?.recommendation ?? "—"}</div>
       </div>
       <div class="card">
         <div class="card-header">Confidence</div>
-        <div class="card-value">${safeNum(prediction?.confidence, 0)}%</div>
+        <div class="card-value">${conf}%</div>
         <div class="card-label">Failover level: ${weatherData?.failoverLevel ?? 0}</div>
       </div>
       <div class="card">
@@ -95,20 +184,31 @@ export function renderSnowday(container, prediction, weatherData, settings) {
     </div>
 
     <h2>Why</h2>
-    <div class="card">
-      ${(prediction?.factors || [])
-        .map((f) => barRow(f.name, f.score, f.weight, f.explanation))
-        .join("")}
+    <div class="card why-card">
+      <div class="why-summary">
+        <div class="why-summary-title">Top drivers</div>
+        <div class="why-chips">
+          ${
+            topDrivers.length
+              ? topDrivers
+                  .map(
+                    (f) =>
+                      `<span class="why-chip"><b>${f.name}</b> • ${clamp(Math.round(safeNum(f.score,0)),0,100)}%</span>`
+                  )
+                  .join("")
+              : `<span class="card-label">No factor breakdown available.</span>`
+          }
+        </div>
+      </div>
+
+      <div class="why-details">
+        ${(factors || []).map((f) => barRow(f.name, f.score, f.weight, f.explanation)).join("")}
+      </div>
     </div>
 
-    <h2>Why Not</h2>
+    <h2>Why it might be low</h2>
     <div class="card">
-      <p>If the probability is low, it usually means one or more of these are true:</p>
-      <ul>
-        <li>Snow is light or falls mostly outside the commute window.</li>
-        <li>Temps are warm enough for melting/treated roads.</li>
-        <li>Precipitation is uncertain or not wintry.</li>
-      </ul>
+      ${describeLowProbability(prediction, weatherData)}
     </div>
   `;
 }
@@ -116,7 +216,6 @@ export function renderSnowday(container, prediction, weatherData, settings) {
 function normalizeWeatherData(weatherData) {
   if (!weatherData || !Array.isArray(weatherData.hourly)) return weatherData;
 
-  // Algorithm compares h.time as Date objects; convert ISO strings/numbers to Date.
   weatherData.hourly = weatherData.hourly.map((h) => {
     const t = h?.time;
     const time =
@@ -170,7 +269,6 @@ async function fetchOpenMeteoHourly({ lat, lon }) {
 }
 
 async function fetchNwsHourly({ lat, lon }) {
-  // NWS: points -> forecastHourly
   const pointsUrl = `https://api.weather.gov/points/${lat},${lon}`;
   const pRes = await fetch(pointsUrl, {
     cache: "no-store",
@@ -190,10 +288,7 @@ async function fetchNwsHourly({ lat, lon }) {
   const hJson = await hRes.json();
 
   const periods = hJson?.properties?.periods || [];
-
-  // NWS doesn’t always provide explicit snowfall totals. Map what we can.
   const hourly = periods.map((p) => {
-    // windSpeed like "10 mph" or "5 to 10 mph"
     const wind =
       typeof p.windSpeed === "string" ? parseFloat(p.windSpeed) || 0 : 0;
 
@@ -215,28 +310,23 @@ async function fetchNwsHourly({ lat, lon }) {
 async function getWeatherDataBestEffort(settings) {
   const API = window.API;
 
-  // 1) Your internal providers (best)
   if (API?.getSnowdayWeather) return API.getSnowdayWeather();
   if (API?.getHourlyForecast) return API.getHourlyForecast();
   if (API?.getForecastHourly) return API.getForecastHourly();
   if (API?.getWeatherData) return API.getWeatherData();
   if (API?.getWeather) return API.getWeather();
 
-  // 2) Cached storage (if your app stores it)
   if (window.Storage?.getLastWeatherData) return window.Storage.getLastWeatherData();
   if (window.Storage?.getCachedWeather) return window.Storage.getCachedWeather();
 
-  // 3) External fallbacks (no keys)
   const loc = resolveLocation(settings);
 
-  // Open-Meteo first (has snowfall)
   try {
     return await fetchOpenMeteoHourly(loc);
   } catch (e) {
     console.warn("Open-Meteo fallback failed:", e);
   }
 
-  // Then NWS hourly
   return await fetchNwsHourly(loc);
 }
 
@@ -258,11 +348,8 @@ export async function initSnowDayPage() {
     let weatherData = await getWeatherDataBestEffort(settings);
     weatherData = normalizeWeatherData(weatherData);
 
-    // Helpful: if your algorithm expects other field names, you can adapt here later.
     const prediction = window.SnowDayAlgorithm.calculate(weatherData, settings);
 
-    // If you want to show the resolved location name even when settings are empty:
-    // store it in settings clone for render label
     const renderSettings = {
       ...settings,
       location: settings.location ?? loc,
@@ -283,7 +370,6 @@ export async function initSnowDayPage() {
   }
 }
 
-// Make available to your non-module inline init call in snowday.html
 if (typeof window !== "undefined") {
   window.renderSnowday = renderSnowday;
   window.initSnowDayPage = initSnowDayPage;
