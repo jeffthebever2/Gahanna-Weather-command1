@@ -1,0 +1,64 @@
+{
+  "features": [
+    {
+      "id": "urn:oid:2.49.0.1.840.0.1234567890",
+      "type": "Feature",
+      "properties": {
+        "id": "urn:oid:2.49.0.1.840.0.1234567890",
+        "areaDesc": "Franklin; Delaware; Licking",
+        "geocode": {
+          "SAME": ["039049", "039041", "039089"]
+        },
+        "sent": "2026-01-05T10:00:00-05:00",
+        "effective": "2026-01-05T12:00:00-05:00",
+        "onset": "2026-01-05T18:00:00-05:00",
+        "expires": "2026-01-06T12:00:00-05:00",
+        "ends": "2026-01-06T06:00:00-05:00",
+        "status": "Actual",
+        "messageType": "Alert",
+        "category": "Met",
+        "severity": "Severe",
+        "certainty": "Likely",
+        "urgency": "Expected",
+        "event": "Winter Storm Warning",
+        "sender": "w-nws.webmaster@noaa.gov",
+        "senderName": "NWS Columbus OH",
+        "headline": "Winter Storm Warning issued January 5 at 10:00AM EST until January 6 at 12:00PM EST by NWS Columbus OH",
+        "description": "Heavy snow expected. Total snow accumulations of 6 to 10 inches. Winds gusting as high as 35 mph.",
+        "instruction": "If you must travel, keep an extra flashlight, food, and water in your vehicle in case of an emergency. The latest road conditions can be obtained by calling 5 1 1.",
+        "response": "Prepare",
+        "parameters": {
+          "AWIPSidentifier": ["WSWCLE"],
+          "WMOidentifier": ["WWUS41 KCLE 051500"],
+          "eventMotionDescription": ["2026-01-05T15:00:00-00:00...storm..."],
+          "EAS-ORG": ["WXR"]
+        }
+      }
+    },
+    {
+      "id": "urn:oid:2.49.0.1.840.0.9876543210",
+      "type": "Feature",
+      "properties": {
+        "id": "urn:oid:2.49.0.1.840.0.9876543210",
+        "areaDesc": "Franklin",
+        "sent": "2026-01-05T08:00:00-05:00",
+        "effective": "2026-01-05T08:00:00-05:00",
+        "onset": "2026-01-05T08:00:00-05:00",
+        "expires": "2026-01-05T20:00:00-05:00",
+        "status": "Actual",
+        "messageType": "Alert",
+        "category": "Met",
+        "severity": "Moderate",
+        "certainty": "Likely",
+        "urgency": "Expected",
+        "event": "Wind Chill Advisory",
+        "sender": "w-nws.webmaster@noaa.gov",
+        "senderName": "NWS Columbus OH",
+        "headline": "Wind Chill Advisory issued January 5 at 8:00AM EST until January 5 at 8:00PM EST by NWS Columbus OH",
+        "description": "Very cold wind chills as low as 15 below zero expected.",
+        "instruction": "Use caution while traveling outside. Wear appropriate clothing.",
+        "response": "Execute"
+      }
+    }
+  ]
+}

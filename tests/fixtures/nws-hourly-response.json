@@ -1,0 +1,47 @@
+{
+  "properties": {
+    "periods": [
+      {
+        "number": 1,
+        "name": "This Afternoon",
+        "startTime": "2026-01-05T14:00:00-05:00",
+        "endTime": "2026-01-05T18:00:00-05:00",
+        "isDaytime": true,
+        "temperature": 28,
+        "temperatureUnit": "F",
+        "windSpeed": "10 mph",
+        "windDirection": "W",
+        "shortForecast": "Light Snow",
+        "detailedForecast": "Light snow. Cloudy. Low around 28.",
+        "probabilityOfPrecipitation": {
+          "unitCode": "wmoUnit:percent",
+          "value": 80
+        },
+        "relativeHumidity": {
+          "unitCode": "wmoUnit:percent",
+          "value": 85
+        }
+      },
+      {
+        "number": 2,
+        "startTime": "2026-01-05T18:00:00-05:00",
+        "endTime": "2026-01-06T06:00:00-05:00",
+        "isDaytime": false,
+        "temperature": 20,
+        "temperatureUnit": "F",
+        "windSpeed": "15 mph",
+        "windDirection": "NW",
+        "shortForecast": "Snow",
+        "detailedForecast": "Snow. Cloudy. Low around 20. Chance of precipitation is 90%.",
+        "probabilityOfPrecipitation": {
+          "unitCode": "wmoUnit:percent",
+          "value": 90
+        },
+        "relativeHumidity": {
+          "unitCode": "wmoUnit:percent",
+          "value": 90
+        }
+      }
+    ]
+  }
+}

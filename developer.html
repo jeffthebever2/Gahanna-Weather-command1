@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Developer - Gahanna Weather Command</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  
+</head>
+<body>
+  <div id="app">
+    <nav id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <h1>🌤️ Weather Command</h1>
+        <button id="menu-toggle" class="menu-toggle">☰</button>
+      </div>
+      <ul class="nav-links">
+        <li><a href="index.html">Dashboard</a></li>
+        <li><a href="forecast.html">Forecast</a></li>
+        <li><a href="alerts.html">Alerts</a></li>
+        <li><a href="snowday.html">Snow Day</a></li>
+        <li><a href="maps.html">Maps</a></li>
+        <li><a href="feeds.html">Feeds</a></li>
+        <li><a href="history.html">History</a></li>
+        <li><a href="settings.html">Settings</a></li>
+        <li><a href="diagnostics.html">Diagnostics</a></li>
+        <li><a href="developer.html">Developer</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </nav>
+    <main class="main-content">
+      <h1>Developer Documentation</h1><div class="doc-content"><section><h2>Provider Failover System</h2><p>Weather data sources tried in priority order with automatic failover.</p></section><section><h2>Snow Day Algorithm</h2><p>Located in assets/snowday-algorithm.js with tunable weights.</p></section></div>
+    </main>
+  </div>
+  <script type="module" src="assets/nav.js"></script><script>document.addEventListener("DOMContentLoaded", () => window.initNav());</script>
+</body>
+</html>

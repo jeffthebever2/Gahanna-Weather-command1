@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gahanna Weather Command</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <nav id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <h1>🌤️ Weather Command</h1>
+        <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">☰</button>
+      </div>
+      <ul class="nav-links">
+        <li><a href="index.html" class="active">Dashboard</a></li>
+        <li><a href="forecast.html">Forecast</a></li>
+        <li><a href="alerts.html">Alerts</a></li>
+        <li><a href="snowday.html">Snow Day</a></li>
+        <li><a href="maps.html">Maps</a></li>
+        <li><a href="feeds.html">Feeds</a></li>
+        <li><a href="history.html">History</a></li>
+        <li><a href="settings.html">Settings</a></li>
+        <li><a href="diagnostics.html">Diagnostics</a></li>
+        <li><a href="developer.html">Developer</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </nav>
+    <main class="main-content">
+      <div id="stale-banner" class="stale-banner hidden"></div>
+      <div id="error-banner" class="error-banner hidden"></div>
+      <div id="dashboard-container"></div>
+    </main>
+  </div>
+  <script type="module" src="assets/config.js"></script>
+  <script type="module" src="assets/schema.js"></script>
+  <script type="module" src="assets/fetcher.js"></script>
+  <script type="module" src="assets/storage.js"></script>
+  <script type="module" src="assets/api.js"></script>
+  <script type="module" src="assets/alerts.js"></script>
+  <script type="module" src="assets/snowday-algorithm.js"></script>
+  <script type="module" src="assets/ui.js"></script>
+  <script type="module" src="assets/nav.js"></script>
+  <script type="module" src="assets/dashboard.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      window.initNav();
+      window.initDashboard();
+    });
+  </script>
+</body>
+</html>

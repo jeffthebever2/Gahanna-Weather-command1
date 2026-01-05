@@ -1,0 +1,36 @@
+{
+  "description": "Edge case: temperatures hovering around freezing with mixed precipitation",
+  "latitude": 40.0192,
+  "longitude": -82.8794,
+  "current": {
+    "temperature_2m": 32.1,
+    "relative_humidity_2m": 95,
+    "apparent_temperature": 28.5,
+    "precipitation": 0.15,
+    "weather_code": 67,
+    "wind_speed_10m": 8
+  },
+  "hourly": {
+    "time": [
+      "2026-01-05T22:00",
+      "2026-01-05T23:00",
+      "2026-01-06T00:00",
+      "2026-01-06T01:00",
+      "2026-01-06T02:00",
+      "2026-01-06T03:00",
+      "2026-01-06T04:00",
+      "2026-01-06T05:00",
+      "2026-01-06T06:00",
+      "2026-01-06T07:00",
+      "2026-01-06T08:00"
+    ],
+    "temperature_2m": [33, 32.5, 32, 31.8, 31.5, 31.2, 31, 31.5, 32, 32.5, 33],
+    "precipitation": [0.1, 0.12, 0.15, 0.18, 0.2, 0.18, 0.15, 0.12, 0.1, 0.08, 0.05],
+    "snowfall": [0, 0, 0.3, 0.5, 0.7, 0.6, 0.4, 0.3, 0.2, 0, 0],
+    "weather_code": [61, 61, 67, 71, 71, 71, 71, 71, 61, 61, 3],
+    "wind_speed_10m": [8, 9, 10, 11, 12, 13, 14, 13, 12, 11, 10],
+    "wind_gusts_10m": [12, 14, 16, 18, 20, 22, 24, 22, 20, 18, 16],
+    "relative_humidity_2m": [95, 95, 96, 97, 98, 98, 97, 96, 95, 94, 92]
+  },
+  "notes": "This fixture represents challenging forecasting conditions where temperatures hover near freezing, making precipitation type uncertain. This tests the ice risk calculation and confidence adjustments for uncertain precip type."
+}

@@ -1,0 +1,47 @@
+{
+  "name": "gahanna-weather-command",
+  "version": "1.0.0",
+  "description": "Ultimate weather command center for Gahanna, Ohio with Snow Day predictor, alerts, and monitoring",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint assets/**/*.js tests/**/*.js scripts/**/*.mjs",
+    "lint:fix": "eslint assets/**/*.js tests/**/*.js scripts/**/*.mjs --fix",
+    "smoke": "node scripts/smoke-test.mjs",
+    "validate": "npm run lint && npm run smoke && npm run test",
+    "dev": "npx serve -l 8000",
+    "preview": "npx serve -l 8000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/gahanna-weather-command.git"
+  },
+  "keywords": [
+    "weather",
+    "snow-day",
+    "alerts",
+    "gahanna",
+    "ohio",
+    "dashboard",
+    "command-center"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yourusername/gahanna-weather-command/issues"
+  },
+  "homepage": "https://github.com/yourusername/gahanna-weather-command#readme",
+  "devDependencies": {
+    "@vitest/coverage-v8": "^1.0.4",
+    "eslint": "^8.56.0",
+    "html-validate": "^8.9.1",
+    "jsdom": "^23.0.1",
+    "serve": "^14.2.1",
+    "vitest": "^1.0.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feeds - Gahanna Weather Command</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  
+</head>
+<body>
+  <div id="app">
+    <nav id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <h1>🌤️ Weather Command</h1>
+        <button id="menu-toggle" class="menu-toggle">☰</button>
+      </div>
+      <ul class="nav-links">
+        <li><a href="index.html">Dashboard</a></li>
+        <li><a href="forecast.html">Forecast</a></li>
+        <li><a href="alerts.html">Alerts</a></li>
+        <li><a href="snowday.html">Snow Day</a></li>
+        <li><a href="maps.html">Maps</a></li>
+        <li><a href="feeds.html">Feeds</a></li>
+        <li><a href="history.html">History</a></li>
+        <li><a href="settings.html">Settings</a></li>
+        <li><a href="diagnostics.html">Diagnostics</a></li>
+        <li><a href="developer.html">Developer</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </nav>
+    <main class="main-content">
+      <h1>Feeds PAGE_CONTENT Monitoring</h1><div id="signals-detected" class="signals-box"></div><div class="feeds-grid"><section class="feed-section"><h2>RSS Feeds</h2><div id="rss-feeds"></div></section><section class="feed-section"><h2>Source Links</h2><div id="source-links"></div></section><section class="feed-section"><h2>Scanner Links</h2><div id="scanner-links"></div></section><section class="feed-section"><h2>Quick Notes</h2><textarea id="quick-notes" rows="6"></textarea><button id="save-notes" class="btn btn-primary">Save</button></section></div>
+    </main>
+  </div>
+  <script type="module" src="assets/config.js"></script><script type="module" src="assets/storage.js"></script><script type="module" src="assets/feeds.js"></script><script type="module" src="assets/ui.js"></script><script type="module" src="assets/nav.js"></script><script>document.addEventListener("DOMContentLoaded", () => { window.initNav(); window.initFeedsPage(); });</script>
+</body>
+</html>

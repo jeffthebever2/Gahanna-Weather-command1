@@ -1,0 +1,59 @@
+{
+  "latitude": 40.0192,
+  "longitude": -82.8794,
+  "generationtime_ms": 0.123,
+  "utc_offset_seconds": -18000,
+  "timezone": "America/New_York",
+  "timezone_abbreviation": "EST",
+  "elevation": 257,
+  "current": {
+    "time": "2026-01-05T14:00",
+    "interval": 900,
+    "temperature_2m": 28.5,
+    "relative_humidity_2m": 75,
+    "apparent_temperature": 21.3,
+    "precipitation": 0,
+    "snowfall": 0,
+    "weather_code": 3,
+    "cloud_cover": 75,
+    "pressure_msl": 1015.2,
+    "wind_speed_10m": 8.5,
+    "wind_direction_10m": 270,
+    "wind_gusts_10m": 12.3
+  },
+  "hourly": {
+    "time": [
+      "2026-01-05T15:00",
+      "2026-01-05T16:00",
+      "2026-01-05T17:00",
+      "2026-01-05T18:00",
+      "2026-01-05T19:00",
+      "2026-01-05T20:00",
+      "2026-01-05T21:00",
+      "2026-01-05T22:00",
+      "2026-01-05T23:00",
+      "2026-01-06T00:00"
+    ],
+    "temperature_2m": [27.5, 26.0, 24.5, 23.0, 21.5, 20.0, 19.0, 18.5, 18.0, 17.5],
+    "relative_humidity_2m": [78, 80, 82, 85, 88, 90, 92, 93, 94, 95],
+    "apparent_temperature": [20.0, 18.5, 16.8, 15.2, 13.5, 11.8, 10.5, 9.8, 9.2, 8.5],
+    "precipitation": [0, 0, 0.05, 0.12, 0.18, 0.25, 0.32, 0.28, 0.20, 0.15],
+    "snowfall": [0, 0, 0.3, 0.7, 1.2, 1.8, 2.1, 1.9, 1.3, 0.9],
+    "weather_code": [3, 71, 73, 73, 75, 75, 75, 73, 71, 71],
+    "cloud_cover": [75, 85, 95, 100, 100, 100, 100, 95, 90, 85],
+    "wind_speed_10m": [9.0, 10.5, 12.0, 13.5, 15.0, 16.5, 18.0, 17.0, 15.5, 14.0],
+    "wind_direction_10m": [270, 275, 280, 285, 290, 295, 300, 305, 310, 315],
+    "wind_gusts_10m": [13.0, 15.2, 17.5, 19.8, 22.0, 24.5, 27.0, 25.0, 22.5, 20.0]
+  },
+  "daily": {
+    "time": ["2026-01-05", "2026-01-06", "2026-01-07"],
+    "temperature_2m_max": [30.0, 22.0, 35.0],
+    "temperature_2m_min": [18.0, 15.0, 20.0],
+    "precipitation_sum": [0.5, 2.5, 0.0],
+    "snowfall_sum": [0.0, 5.5, 0.0],
+    "precipitation_probability_max": [30, 90, 10],
+    "weather_code": [3, 75, 1],
+    "sunrise": ["2026-01-05T07:52", "2026-01-06T07:52", "2026-01-07T07:52"],
+    "sunset": ["2026-01-05T17:32", "2026-01-06T17:33", "2026-01-07T17:34"]
+  }
+}
