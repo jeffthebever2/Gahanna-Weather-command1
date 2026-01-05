@@ -345,3 +345,26 @@ tr:hover td { background: rgba(255,255,255,0.03); }
   .card-value { font-size: 24px; }
   .main-content { padding: 14px 12px 30px; }
 }
+#bottomTicker{
+  position: fixed;
+  bottom: 0;          /* THIS is the key line */
+  left: 0;
+  right: 0;
+  z-index: 9999;
+
+  background: rgba(0,0,0,0.85);
+  border-top: 1px solid rgba(255,255,255,0.15);
+}
+
+/* Make sure the RSS widget spans full width */
+#bottomTicker rssapp-ticker,
+#bottomTicker iframe{
+  width: 100% !important;
+  display: block;
+}
+
+/* Prevent content from hiding behind ticker */
+body{
+  padding-bottom: 64px;
+}
+
