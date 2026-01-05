@@ -1,6 +1,6 @@
 /**
  * snowday-ui.js
- * Renders Snow Day / School Impact prediction page.
+ * Renders + initializes Snow Day / School Impact prediction page.
  */
 
 function barRow(name, score, weight, explanation) {
@@ -21,7 +21,7 @@ function barRow(name, score, weight, explanation) {
 }
 
 export function renderSnowday(container, prediction, weatherData, settings) {
-  const s = settings || window.Storage.getSettings();
+  const s = settings || window.Storage?.getSettings?.() || {};
   const loc = s.location?.name || 'Location';
   const bus = s.schoolTimes?.busTime || '07:00';
   const bell = s.schoolTimes?.firstBell || '08:00';
@@ -65,6 +65,78 @@ export function renderSnowday(container, prediction, weatherData, settings) {
   `;
 }
 
+function normalizeWeatherData(weatherData) {
+  if (!weatherData || !Array.isArray(weatherData.hourly)) return weatherData;
+
+  // Algorithm compares h.time as Date objects; convert ISO strings/numbers to Date.
+  weatherData.hourly = weatherData.hourly.map((h) => {
+    const t = h?.time;
+    const time =
+      t instanceof Date ? t :
+      (typeof t === 'string' || typeof t === 'number') ? new Date(t) :
+      null;
+
+    return { ...h, time: time ?? new Date() };
+  });
+
+  return weatherData;
+}
+
+async function getWeatherDataBestEffort() {
+  // Try a few common shapes without hard-crashing your page.
+  const API = window.API;
+
+  if (API?.getSnowdayWeather) return API.getSnowdayWeather();
+  if (API?.getHourlyForecast) return API.getHourlyForecast();
+  if (API?.getForecastHourly) return API.getForecastHourly();
+  if (API?.getWeatherData) return API.getWeatherData();
+  if (API?.getWeather) return API.getWeather();
+
+  // Last-ditch: maybe you cached it in Storage
+  if (window.Storage?.getLastWeatherData) return window.Storage.getLastWeatherData();
+  if (window.Storage?.getCachedWeather) return window.Storage.getCachedWeather();
+
+  throw new Error(
+    "No weather data method found. Expected one of: API.getHourlyForecast/getWeatherData/getWeather, or Storage cached getter."
+  );
+}
+
+export async function initSnowDayPage() {
+  const container = document.getElementById('snowday-container');
+  if (!container) {
+    console.error('Snow Day page: missing #snowday-container');
+    return;
+  }
+
+  try {
+    // Make sure Storage + Algorithm exist
+    const settings = window.Storage?.getSettings?.() || {};
+    if (!window.SnowDayAlgorithm?.calculate) {
+      throw new Error("SnowDayAlgorithm not loaded (window.SnowDayAlgorithm.calculate missing).");
+    }
+
+    let weatherData = await getWeatherDataBestEffort();
+    weatherData = normalizeWeatherData(weatherData);
+
+    const prediction = window.SnowDayAlgorithm.calculate(weatherData, settings);
+    renderSnowday(container, prediction, weatherData, settings);
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = `
+      <h1>Snow Day / School Impact</h1>
+      <div class="card">
+        <div class="card-header">Error</div>
+        <p class="card-label">Snow Day page failed to load.</p>
+        <pre style="white-space:pre-wrap;overflow:auto;margin:0;">${String(err?.message || err)}</pre>
+        <p class="card-label">Open DevTools → Console for details.</p>
+      </div>
+    `;
+  }
+}
+
 if (typeof window !== 'undefined') {
   window.renderSnowday = renderSnowday;
+  window.initSnowDayPage = initSnowDayPage;
+  // Backward-compat: your HTML calls initSnowDayPage(), keep it working
+  window.initSnowDayPage = initSnowDayPage;
 }
