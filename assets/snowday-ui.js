@@ -1,89 +1,54 @@
-/**
- * snowday-ui.js
- * Renders + initializes Snow Day / School Impact prediction page.
- */
+async function fetchOpenMeteoFallback(settings) {
+  // Try multiple possible shapes for saved location
+  const loc =
+    settings?.location ||
+    settings?.loc ||
+    settings?.site?.location ||
+    null;
 
-function barRow(name, score, weight, explanation) {
-  const pct = Math.round(score);
-  const contrib = Math.round(score * weight);
-  return `
-    <div class="factor-row">
-      <div class="factor-head">
-        <div class="factor-name">${name}</div>
-        <div class="factor-meta">Score ${pct} • Weight ${Math.round(weight * 100)}% • Contrib ${contrib}</div>
-      </div>
-      <div class="factor-bar">
-        <div class="factor-bar-fill" style="width:${pct}%"></div>
-      </div>
-      <div class="factor-expl">${explanation}</div>
-    </div>
-  `;
-}
+  const lat = loc?.lat ?? loc?.latitude;
+  const lon = loc?.lon ?? loc?.lng ?? loc?.longitude;
 
-export function renderSnowday(container, prediction, weatherData, settings) {
-  const s = settings || window.Storage?.getSettings?.() || {};
-  const loc = s.location?.name || 'Location';
-  const bus = s.schoolTimes?.busTime || '07:00';
-  const bell = s.schoolTimes?.firstBell || '08:00';
+  if (typeof lat !== "number" || typeof lon !== "number") {
+    throw new Error(
+      "No weather data method found AND no saved lat/lon. Go to Settings and set your location so Snow Day can fetch fallback data."
+    );
+  }
 
-  container.innerHTML = `
-    <h1>Snow Day / School Impact</h1>
-    <p class="card-label">${loc} • Bus ${bus} • First bell ${bell}</p>
+  const url =
+    "https://api.open-meteo.com/v1/forecast" +
+    `?latitude=${encodeURIComponent(lat)}` +
+    `&longitude=${encodeURIComponent(lon)}` +
+    `&hourly=temperature_2m,precipitation,snowfall,wind_speed_10m,visibility` +
+    `&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch` +
+    `&timezone=auto&forecast_days=2`;
 
-    <div class="cards-grid">
-      <div class="card">
-        <div class="card-header">Probability</div>
-        <div class="card-value">${prediction.probability}%</div>
-        <div class="card-label">${prediction.recommendation}</div>
-      </div>
-      <div class="card">
-        <div class="card-header">Confidence</div>
-        <div class="card-value">${prediction.confidence}%</div>
-        <div class="card-label">Failover level: ${weatherData?.failoverLevel ?? 0}</div>
-      </div>
-      <div class="card">
-        <div class="card-header">Human Adjustment</div>
-        <div class="card-value">${prediction.humanAdjustment >= 0 ? '+' : ''}${prediction.humanAdjustment}</div>
-        <div class="card-label">Bounded to ±10</div>
-      </div>
-    </div>
+  const r = await fetch(url, { cache: "no-store" });
+  if (!r.ok) throw new Error(`Open-Meteo fallback failed: HTTP ${r.status}`);
+  const j = await r.json();
 
-    <h2>Why</h2>
-    <div class="card">
-      ${prediction.factors.map((f) => barRow(f.name, f.score, f.weight, f.explanation)).join('')}
-    </div>
+  // Convert Open-Meteo hourly arrays into your algorithm-friendly objects
+  const hourly = (j.hourly?.time || []).map((t, i) => {
+    const snowfallCm = j.hourly?.snowfall?.[i] ?? 0; // Open-Meteo snowfall is in cm
+    const snowfallIn = snowfallCm / 2.54;
 
-    <h2>Why Not</h2>
-    <div class="card">
-      <p>If the probability is low, it usually means one or more of these are true:</p>
-      <ul>
-        <li>Snow is light or falls mostly outside the commute window.</li>
-        <li>Temps are warm enough for melting/treated roads.</li>
-        <li>Precipitation is uncertain or not wintry.</li>
-      </ul>
-    </div>
-  `;
-}
-
-function normalizeWeatherData(weatherData) {
-  if (!weatherData || !Array.isArray(weatherData.hourly)) return weatherData;
-
-  // Algorithm compares h.time as Date objects; convert ISO strings/numbers to Date.
-  weatherData.hourly = weatherData.hourly.map((h) => {
-    const t = h?.time;
-    const time =
-      t instanceof Date ? t :
-      (typeof t === 'string' || typeof t === 'number') ? new Date(t) :
-      null;
-
-    return { ...h, time: time ?? new Date() };
+    return {
+      time: new Date(t),
+      tempF: j.hourly?.temperature_2m?.[i] ?? null,
+      precipIn: j.hourly?.precipitation?.[i] ?? 0,
+      snowIn: snowfallIn,
+      windMph: j.hourly?.wind_speed_10m?.[i] ?? 0,
+      visibilityMi:
+        j.hourly?.visibility?.[i] != null
+          ? (j.hourly.visibility[i] / 1609.344)
+          : null,
+    };
   });
 
-  return weatherData;
+  return { hourly, failoverLevel: 99, provider: "open-meteo-fallback" };
 }
 
-async function getWeatherDataBestEffort() {
-  // Try a few common shapes without hard-crashing your page.
+async function getWeatherDataBestEffort(settings) {
   const API = window.API;
 
   if (API?.getSnowdayWeather) return API.getSnowdayWeather();
@@ -92,51 +57,9 @@ async function getWeatherDataBestEffort() {
   if (API?.getWeatherData) return API.getWeatherData();
   if (API?.getWeather) return API.getWeather();
 
-  // Last-ditch: maybe you cached it in Storage
   if (window.Storage?.getLastWeatherData) return window.Storage.getLastWeatherData();
   if (window.Storage?.getCachedWeather) return window.Storage.getCachedWeather();
 
-  throw new Error(
-    "No weather data method found. Expected one of: API.getHourlyForecast/getWeatherData/getWeather, or Storage cached getter."
-  );
-}
-
-export async function initSnowDayPage() {
-  const container = document.getElementById('snowday-container');
-  if (!container) {
-    console.error('Snow Day page: missing #snowday-container');
-    return;
-  }
-
-  try {
-    // Make sure Storage + Algorithm exist
-    const settings = window.Storage?.getSettings?.() || {};
-    if (!window.SnowDayAlgorithm?.calculate) {
-      throw new Error("SnowDayAlgorithm not loaded (window.SnowDayAlgorithm.calculate missing).");
-    }
-
-    let weatherData = await getWeatherDataBestEffort();
-    weatherData = normalizeWeatherData(weatherData);
-
-    const prediction = window.SnowDayAlgorithm.calculate(weatherData, settings);
-    renderSnowday(container, prediction, weatherData, settings);
-  } catch (err) {
-    console.error(err);
-    container.innerHTML = `
-      <h1>Snow Day / School Impact</h1>
-      <div class="card">
-        <div class="card-header">Error</div>
-        <p class="card-label">Snow Day page failed to load.</p>
-        <pre style="white-space:pre-wrap;overflow:auto;margin:0;">${String(err?.message || err)}</pre>
-        <p class="card-label">Open DevTools → Console for details.</p>
-      </div>
-    `;
-  }
-}
-
-if (typeof window !== 'undefined') {
-  window.renderSnowday = renderSnowday;
-  window.initSnowDayPage = initSnowDayPage;
-  // Backward-compat: your HTML calls initSnowDayPage(), keep it working
-  window.initSnowDayPage = initSnowDayPage;
+  // Fallback that always works if location exists
+  return fetchOpenMeteoFallback(settings);
 }
