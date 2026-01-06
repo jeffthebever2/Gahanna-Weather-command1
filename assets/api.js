@@ -170,6 +170,9 @@ async function fetchOpenMeteo(lat, lon) {
   url.searchParams.set('current', 'temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,wind_gusts_10m,pressure_msl,weather_code');
   url.searchParams.set('hourly', 'temperature_2m,precipitation,snowfall,wind_speed_10m,wind_gusts_10m,relative_humidity_2m');
   url.searchParams.set('daily', 'temperature_2m_max,temperature_2m_min,precipitation_probability_max');
+  url.searchParams.set('temperature_unit', 'fahrenheit');
+url.searchParams.set('wind_speed_unit', 'mph');
+url.searchParams.set('precipitation_unit', 'inch');
 
   const { json, ms } = await fetchJson(url.toString());
   const normalized = normalizeOpenMeteo(json);
