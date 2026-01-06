@@ -368,5 +368,108 @@ tr:hover td { background: rgba(255,255,255,0.03); }
   /* prevent your content being hidden behind it */
   body { padding-bottom: 70px !important; }
 </style>
+/* Snow Day - Why section polish */
+.why-card .why-summary{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 12px;
+}
+
+.why-summary-title{
+  font-weight: 800;
+  opacity: 0.95;
+}
+
+.why-chips{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.why-chip{
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.10);
+  font-size: 12px;
+}
+
+.factor-row{
+  padding: 10px 0;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.factor-row:first-child{ border-top: none; }
+
+.factor-head{
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+.factor-name{ font-weight: 800; }
+.factor-meta{ opacity: 0.8; font-size: 12px; }
+
+.factor-bar{
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.10);
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.factor-bar-fill{
+  height: 100%;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.55);
+}
+
+.factor-expl{
+  opacity: 0.9;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.why-low-box{
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.why-low-title{
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.why-low-list{
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+  opacity: 0.95;
+}
+
+.why-low-list.compact{
+  gap: 8px;
+}
+
+.why-low-sub{
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.10);
+}
+
+.why-low-subtitle{
+  font-weight: 800;
+  margin-bottom: 6px;
+  opacity: 0.95;
+}
+
 
 
