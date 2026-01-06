@@ -471,5 +471,58 @@ tr:hover td { background: rgba(255,255,255,0.03); }
   opacity: 0.95;
 }
 
+/* ==== Dashboard polish ==== */
+.card-header-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.card-title{
+  font-weight:800;
+  font-size:16px;
+}
+
+.card-subtle{
+  font-size:12px;
+  opacity:.75;
+  margin-top:8px;
+}
+
+/* Radar */
+.radar-wrap{
+  border-radius:14px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.1);
+}
+.radar-wrap img{
+  width:100%;
+  display:block;
+}
+
+/* Forecast */
+.forecast-list{
+  display:grid;
+  gap:10px;
+}
+.forecast-row{
+  display:flex;
+  justify-content:space-between;
+  padding:10px 12px;
+  border-radius:12px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);
+}
+.forecast-name{ font-weight:800; }
+.forecast-detail{ font-size:13px; opacity:.85; }
+.forecast-side{ text-align:right; }
+.forecast-temp{ font-weight:900; }
+.forecast-pop{ font-size:12px; opacity:.8; }
+
+/* Chart */
+.chart-wrap{
+  height:260px;
+}
 
 
